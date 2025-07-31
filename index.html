@@ -2,27 +2,32 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
   <title>СамСобіШеф | Робота в Одесі</title>
   <meta name="description" content="СамСобіШеф — дошка підробітку та виконавців в Одесі та області. Додавайте завдання, шукайте роботу!">
   <link rel="icon" type="image/png" href="https://i.ibb.co/HLc01jWL/22c6c8c1-5106-4955-bec9-7c071a2a41e3.png"/>
   <style>
-    body {font-family: Arial,sans-serif; background:#f5f7fc; margin:0; padding:0;}
-    .main-app {max-width:430px; margin:44px auto 0; padding:0 6px;}
-    .logo {width:84px; display:block; margin:16px auto 18px; border-radius:22px;}
-    .add-btn-main {background:#2b81f7; color:#fff; border:none; font-weight:700; font-size:1.14em; padding:12px 18px; border-radius:13px; margin:24px auto; display:block; box-shadow:0 2px 12px #d7e4f540; width:100%;transition:.25s;}
-    .ads-list {margin-top:22px;}
+    html, body {height:100%; margin:0; padding:0;}
+    body {font-family: Arial,sans-serif; background:#f5f7fc; margin:0; padding:0; overflow-x:hidden;}
+    .main-app {max-width:430px; min-height:100vh; margin:0 auto; padding:0 6px; display:flex;flex-direction:column;}
+    .logo {width:84px; display:block; margin:24px auto 10px; border-radius:22px;}
+    .search-wrap {width:100%; max-width:430px; margin:0 auto 6px;}
+    .search-inp {width:100%; font-size:16px; padding:11px 14px; border-radius:13px; border:1px solid #d7e4f5; outline:none; margin-bottom:7px;}
+    .ads-window {flex:1; overflow-y:auto; max-height:62vh; min-height:190px; padding-bottom:20px;}
     .ad-card {background:#fff; border-radius:13px; padding:13px 13px 8px 13px; margin-bottom:12px; box-shadow:0 1px 9px #dbe3f330;}
     .ad-title {font-size:16px; margin-bottom:5px; font-weight:600;}
     .ad-meta {font-size:13px; color:#3167ae; margin-bottom:3px;}
     .ad-meta2 {font-size:12px; color:#999;}
-    .modal-bg {position:fixed;z-index:10;top:0;left:0;width:100vw;height:100vh;background:#0005;display:flex;align-items:center;justify-content:center;animation:fadeIn .7s;transition:.4s;opacity:0;pointer-events:none;}
+    .ad-geo {font-size:13px; color:#46a54d; margin-bottom:3px;}
+    .add-btn-main {background:#2b81f7; color:#fff; border:none; font-weight:700; font-size:1.14em; padding:14px 18px; border-radius:13px; margin:16px auto 18px; display:block; box-shadow:0 2px 12px #d7e4f540; width:100%;transition:.25s; position:sticky; bottom:0;}
+    .modal-bg {position:fixed;z-index:11;top:0;left:0;width:100vw;height:100vh;background:#0007;display:flex;align-items:center;justify-content:center;transition:.4s;opacity:0;pointer-events:none;}
     .modal-bg.show {opacity:1; pointer-events:all;}
     .modal-card {background:#fff; border-radius:17px; box-shadow:0 4px 28px #b1d6fc45; width:340px; padding:26px 18px 12px; text-align:left; animation:popin .5s;}
     @keyframes popin {0%{transform:scale(.9);opacity:0;}100%{transform:scale(1);opacity:1;}}
     .modal-card h2 {font-size:18px; margin:0 0 14px;}
     .modal-field {margin-bottom:16px;}
     .modal-field input, .modal-field textarea {width:100%; font-size:15px; padding:9px 9px; border-radius:8px; border:1px solid #d7e4f5; outline:none;}
+    .geo-btn {margin:6px 0 0 0; display:inline-block; font-size:13px; background:#eee; border:none; border-radius:7px; padding:6px 13px; color:#1c5; cursor:pointer;}
     .modal-btns {display:flex;justify-content:flex-end;gap:15px;}
     .modal-btn {padding:10px 21px; font-size:15px; font-weight:700; border-radius:10px; border:none; background:#2186e7; color:#fff; cursor:pointer;}
     .modal-btn.cancel {background:#f0f0f0; color:#205;}
@@ -30,23 +35,49 @@
     .msg.show {opacity:1;}
     .fadein {animation:fadeIn .8s;}
     @keyframes fadeIn {from{opacity:0;}to{opacity:1;}}
-    @media (max-width:500px) {.main-app {margin-top:14px;}}
+    /* Прелоадер */
+    .preloader-bg {position:fixed;z-index:99;top:0;left:0;width:100vw;height:100vh;background:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;}
+    .preloader-logo {width:112px; margin-bottom:20px; filter:drop-shadow(0 2px 18px #b6c8ef);}
+    .loader-bar-wrap {width:200px; height:16px; background:#f2f2f2; border-radius:9px; overflow:hidden;}
+    .loader-bar {height:100%; width:0; background:#2376ee; border-radius:9px; transition:.3s;}
+    @media (max-width:500px) {
+      .main-app {margin-top:0;}
+      .search-wrap {padding-top:12px;}
+      .preloader-bg {padding-bottom:100px;}
+      .loader-bar-wrap {width:80vw;}
+    }
   </style>
 </head>
 <body>
-  <div class="main-app fadein" id="main-app">
-    <img src="https://i.ibb.co/HLc01jWL/22c6c8c1-5106-4955-bec9-7c071a2a41e3.png" class="logo" alt="logo"/>
+  <!-- Прелоадер -->
+  <div class="preloader-bg" id="preloader">
+    <img src="https://i.ibb.co/HLc01jWL/22c6c8c1-5106-4955-bec9-7c071a2a41e3.png" class="preloader-logo"/>
+    <div class="loader-bar-wrap">
+      <div class="loader-bar" id="loader-bar"></div>
+    </div>
+  </div>
+  <div class="main-app fadein" id="main-app" style="visibility:hidden;">
+    <div class="search-wrap">
+      <input type="text" id="search-inp" class="search-inp" placeholder="Пошук по завданням..."/>
+    </div>
+    <div class="ads-window" id="ads-window">
+      <div class="ads-list" id="ads-list"></div>
+    </div>
     <button class="add-btn-main" id="add-btn">Додати оголошення</button>
-    <div class="ads-list" id="ads-list"></div>
   </div>
   <!-- Модалка додавання -->
   <div class="modal-bg" id="add-modal">
     <div class="modal-card">
       <h2>Додати оголошення</h2>
-      <form id="add-form">
+      <form id="add-form" autocomplete="off">
         <div class="modal-field"><textarea id="task-desc" placeholder="Опишіть завдання..." required minlength="10"></textarea></div>
         <div class="modal-field"><input type="number" min="0" id="task-price" placeholder="Ціна, грн" required></div>
         <div class="modal-field"><input type="tel" id="task-phone" placeholder="Телефон" required></div>
+        <div class="modal-field">
+          <button type="button" class="geo-btn" id="geo-btn">Додати геолокацію</button>
+          <span id="geo-ok" style="color:#1c5; font-size:13px; display:none;">✔ Додано</span>
+        </div>
+        <input type="hidden" id="task-geo">
         <div class="modal-btns">
           <button type="button" class="modal-btn cancel" id="cancel-modal">Скасувати</button>
           <button type="submit" class="modal-btn">Опублікувати</button>
@@ -56,8 +87,9 @@
   </div>
   <div class="msg" id="msg"></div>
   <script>
-    // SheetDB API — Твой URL
+    // SheetDB API
     const SHEETDB_API = "https://sheetdb.io/api/v1/yb0rninf8e5x0";
+    let adsCache = [];
     function $(x) {return document.getElementById(x);}
     function showMsg(txt) {
       $('msg').textContent = txt;
@@ -68,39 +100,75 @@
       let p = phone.replace(/\D/g, '');
       return (/^380\d{9}$/.test(p) || /^0\d{9}$/.test(p));
     }
-    function renderAds() {
+    function escapeHtml(t) {
+      return t.replace(/[&<>"']/g,function(m){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[m];});
+    }
+    function renderAds(filter='') {
       fetch(SHEETDB_API)
         .then(resp=>resp.json())
         .then(data=>{
-          let ads = data || [];
-          let wrap = $('ads-list');
-          if(!ads.length) {
-            wrap.innerHTML = '<div style="text-align:center;color:#8a8c9b;">Оголошень ще немає...</div>';
-            return;
-          }
-          wrap.innerHTML = '';
-          ads.reverse().forEach(ad=>{
-            let adHTML = `<div class="ad-card">
-              <div class="ad-title">${ad.desc}</div>
-              <div class="ad-meta">💰 <b>${ad.price}</b> грн | ${ad.phone}</div>
-              <div class="ad-meta2">${ad.time}</div>
-            </div>`;
-            wrap.innerHTML += adHTML;
-          });
+          adsCache = data || [];
+          updateAds(filter);
         });
     }
+    function updateAds(filter='') {
+      let ads = adsCache;
+      let wrap = $('ads-list');
+      // фильтрация
+      if(filter) {
+        const q = filter.toLowerCase();
+        ads = ads.filter(ad=>
+          (ad.desc||'').toLowerCase().includes(q) ||
+          (ad.price||'').toLowerCase().includes(q) ||
+          (ad.phone||'').toLowerCase().includes(q) ||
+          (ad.geo||'').toLowerCase().includes(q)
+        );
+      }
+      if(!ads.length) {
+        wrap.innerHTML = '<div style="text-align:center;color:#8a8c9b;">Оголошень ще немає...</div>';
+        return;
+      }
+      // показываем от старых к новым (новые внизу)
+      wrap.innerHTML = '';
+      ads.forEach(ad=>{
+        let price = ad.price ? escapeHtml(ad.price) : '—';
+        let geoHTML = ad.geo ? `<div class="ad-geo"><a href="https://maps.google.com/?q=${ad.geo}" target="_blank" style="color:#26a;text-decoration:underline;">📍 Геолокація</a></div>` : '';
+        let adHTML = `<div class="ad-card">
+              <div class="ad-title">${escapeHtml(ad.desc||'')}</div>
+              <div class="ad-meta">💰 <b>${price}</b> грн | ${escapeHtml(ad.phone||'')}</div>
+              ${geoHTML}
+              <div class="ad-meta2">${escapeHtml(ad.time||'')}</div>
+            </div>`;
+        wrap.innerHTML += adHTML;
+      });
+      // Скроллим вниз к последнему объявлению
+      setTimeout(()=>{$('ads-window').scrollTop = $('ads-window').scrollHeight;},50);
+    }
+    $('search-inp').oninput = function(){ updateAds(this.value); };
     $('add-btn').onclick = ()=>{ $('add-modal').classList.add('show'); };
-    $('cancel-modal').onclick = ()=>{ $('add-modal').classList.remove('show'); $('add-form').reset();};
+    $('cancel-modal').onclick = ()=>{ $('add-modal').classList.remove('show'); $('add-form').reset();$('geo-ok').style.display='none';$('task-geo').value='';};
+    // Геолокация
+    $('geo-btn').onclick = function(e){
+      e.preventDefault();
+      if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(function(pos){
+          let coords = pos.coords.latitude+','+pos.coords.longitude;
+          $('task-geo').value = coords;
+          $('geo-ok').style.display='inline';
+        },function(){ showMsg('Не вдалося отримати геолокацію!'); });
+      }else showMsg('Браузер не підтримує геолокацію.');
+    };
     $('add-form').onsubmit = function(e){
       e.preventDefault();
-      let desc=$('task-desc').value.trim(),price=$('task-price').value.trim(),phone=$('task-phone').value.trim();
+      let desc=$('task-desc').value.trim(),price=$('task-price').value.trim(),phone=$('task-phone').value.trim(),geo=$('task-geo').value;
       if(desc.length<10)return showMsg('Опис має бути від 10 символів!');
       if(!validUAphone(phone))return showMsg('Телефон некоректний!');
       let ad = {
         desc: desc,
         price: price,
         phone: phone,
-        time: new Date().toLocaleString("uk-UA")
+        time: new Date().toLocaleString("uk-UA"),
+        geo: geo
       };
       fetch(SHEETDB_API, {
         method: "POST",
@@ -108,14 +176,30 @@
         body: JSON.stringify({data: ad})
       }).then(resp=>resp.json())
         .then(()=>{
-          $('add-modal').classList.remove('show');$('add-form').reset();
+          $('add-modal').classList.remove('show');$('add-form').reset();$('geo-ok').style.display='none';$('task-geo').value='';
           showMsg('Оголошення додано!');
-          setTimeout(renderAds, 1200);
+          setTimeout(()=>renderAds($('search-inp').value), 1200);
         });
     };
-    window.onload = renderAds;
+    // Прелоадер
+    let loadPerc = 0, interval = setInterval(()=>{
+      loadPerc+=1.3;
+      if(loadPerc>100)loadPerc=100;
+      $('loader-bar').style.width = loadPerc+'%';
+    },35);
+    setTimeout(()=>{
+      clearInterval(interval);
+      $('preloader').style.display='none';
+      $('main-app').style.visibility='visible';
+      renderAds();
+    }, 5000);
     // Автообновление объявлений каждые 5 секунд
-    setInterval(renderAds, 5000);
+    setInterval(()=>renderAds($('search-inp').value), 5000);
+    // Предотвращаем зум pinch-gesture на мобильных
+    document.addEventListener('gesturestart', function (e) {e.preventDefault();});
+    document.addEventListener('touchmove', function(event){
+      if(event.scale !== 1){event.preventDefault();}
+    }, { passive: false });
   </script>
 </body>
 </html>
