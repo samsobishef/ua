@@ -5,102 +5,73 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>СамСобіШеф | Робота Одеса</title>
   <style>
-    html, body {margin:0;padding:0;width:100vw;height:100vh;min-height:100vh;background:#fff;font-family:Arial,sans-serif;color:#193a6b;}
-    body {display:flex;flex-direction:column;width:100vw;height:100vh;}
-    .fullscreen {position:fixed;top:0;left:0;width:100vw;height:100vh;background:#fff;z-index:999;}
-    .loader-bg {position:fixed;top:0;left:0;width:100vw;height:100vh;background:#fff;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;animation:fadeOut 1.2s 4.2s forwards;}
-    @keyframes fadeOut{to{opacity:0;pointer-events:none;}}
-    .loader-img {width:110px;height:110px;border-radius:18px;margin-bottom:22px;box-shadow:0 8px 32px #d2e7ff90;}
-    .loader-bar {width:120px;height:7px;border-radius:7px;background:#d0e1fa;overflow:hidden;margin-top:8px;}
-    .loader-bar-inner {width:0;height:100%;background:linear-gradient(90deg,#2186e7,#1ab0f9);animation:load-bar 4s linear forwards;}
-    @keyframes load-bar {100%{width:100%;}}
-    .intro {padding:26px 10px 10px 10px;text-align:center;display:none;animation:fadeIn 1.1s;}
-    .intro.show {display:block;}
-    @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-    .main-app {display:none;width:100vw;height:100vh;overflow:hidden;}
-    .top-bar {display:flex;align-items:center;padding:10px 6px 8px 6px;justify-content:space-between;}
-    .user-nick {font-size:15px;font-weight:700;background:#e6f0ff;padding:6px 12px 6px 28px;border-radius:16px;position:relative;}
-    .user-nick:before {content:'👤';position:absolute;left:7px;top:4px;font-size:14px;}
-    .users-count {font-size:13px;font-weight:700;background:#f4f7ff;border-radius:14px;padding:5px 12px;color:#2073d3;}
-    .search-bar {margin:0 auto 8px auto;max-width:400px;display:flex;align-items:center;position:relative;width:95vw;}
-    .search-bar input {width:100%;font-size:14px;padding:7px 28px 7px 11px;border-radius:12px;border:1px solid #d7e4f5;outline:none;}
-    .search-icon {position:absolute;right:8px;top:5px;font-size:15px;color:#2186e7;}
-    .ads-list {max-width:99vw;margin:0 auto;min-height:170px;padding-bottom:55px;}
-    .ad-card {background:#f4f7ff;border-radius:12px;padding:7px 7px 6px 7px;margin-bottom:10px;box-shadow:0 1px 6px #dae7fb26;}
-    .ad-title {font-size:14px;margin-bottom:3px;font-weight:600;}
-    .ad-meta {font-size:11px;color:#27569e;margin-bottom:2px;}
-    .ad-photo {width:98%;border-radius:8px;margin-bottom:5px;margin-top:2px;box-shadow:0 2px 9px #b4d4ff20;}
-    .ad-time {font-size:10px;color:#888;}
-    .ad-actions {display:flex;align-items:center;justify-content:space-between;margin-top:4px;}
-    .ad-likes {font-size:13px;cursor:pointer;color:#2093e7;display:flex;align-items:center;}
+    body {font-family: Arial, sans-serif;background:#f5f7fc;margin:0;padding:0;}
+    .main-app {max-width:430px;margin:36px auto;padding:0 6px;}
+    .logo {width:70px;display:block;margin:28px auto 12px;}
+    .login-form, .reg-form {background:#fff;border-radius:14px;padding:20px 12px 18px;box-shadow:0 2px 18px #d7e4f566;margin-bottom:22px;}
+    .login-form h2, .reg-form h2 {margin-top:0;font-size:1.17em;}
+    .login-form input, .reg-form input {width:100%;padding:10px 9px;margin:8px 0 14px 0;border-radius:10px;border:1px solid #d8e6fc;}
+    .login-form button, .reg-form button, .btn-main {background:#2978e6;color:#fff;border:none;font-weight:bold;font-size:1.04em;padding:12px 0;width:100%;border-radius:10px;box-shadow:0 2px 12px #bdd3fd1c;margin:10px 0;}
+    .switch {text-align:center;color:#1a71b1;cursor:pointer;text-decoration:underline;margin:12px 0 0;}
+    .user-top {display:flex;justify-content:space-between;align-items:center;background:#e3f0ff;border-radius:13px;padding:10px 14px 8px;margin-bottom:13px;}
+    .user-top span {font-size:15px;}
+    .ads-list {margin-top:13px;}
+    .ad-card {background:#fff;border-radius:12px;padding:10px 11px 6px 11px;margin-bottom:10px;box-shadow:0 1px 8px #dbe3f330;}
+    .ad-title {font-size:16px;margin-bottom:6px;font-weight:600;}
+    .ad-meta {font-size:12px;color:#3167ae;margin-bottom:5px;}
+    .ad-actions {display:flex;align-items:center;justify-content:space-between;}
+    .ad-likes {font-size:14px;cursor:pointer;color:#2093e7;display:flex;align-items:center;}
     .ad-likes.liked {color:#ffad3d;}
-    .ad-likes span {margin-left:2px;}
-    .ad-views {font-size:10px;color:#b6cbe8;}
-    .ad-btn {padding:4px 10px;background:#2b81f7;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;}
-    .ad-btn:active {background:#1562be;}
-    .add-btn-main {position:fixed;bottom:18px;left:50%;transform:translateX(-50%);padding:8px 30px;border-radius:16px;background:linear-gradient(90deg,#2186e7,#1ab0f9);color:#fff;font-size:15px;font-weight:700;box-shadow:0 4px 14px #b4c4ee3a;border:none;cursor:pointer;z-index:10;}
-    .scroll-down {display:none;position:fixed;right:9px;bottom:60px;z-index:20;background:#f6faff;border-radius:50%;box-shadow:0 2px 8px #99cdfd28;width:36px;height:36px;align-items:center;justify-content:center;font-size:18px;color:#2186e7;cursor:pointer;}
-    @keyframes fadeInDown{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
-    .modal-bg {position:fixed;z-index:101;top:0;left:0;width:100vw;height:100vh;background:#0003;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.4s;display:none;}
-    .modal-bg.show {display:flex;}
-    .modal-card {background:#fff;border-radius:13px;box-shadow:0 4px 22px #b1d6fc30;max-width:99vw;width:270px;padding:15px 10px 12px;text-align:left;}
-    .modal-card h2 {font-size:16px;margin:0 0 8px 0;}
-    .modal-field {margin-bottom:10px;}
-    .modal-field input, .modal-field textarea {width:100%;font-size:13px;padding:7px;border-radius:7px;border:1px solid #d7e4f5;outline:none;}
-    .modal-btns {display:flex;justify-content:flex-end;gap:9px;}
-    .modal-btn {padding:7px 15px;font-size:12px;font-weight:700;border-radius:8px;border:none;background:#2186e7;color:#fff;cursor:pointer;}
+    .ad-likes span {margin-left:3px;}
+    .ad-views {font-size:13px;color:#b6cbe8;}
+    .ad-btn {padding:6px 16px;background:#2b81f7;color:#fff;border:none;border-radius:12px;cursor:pointer;font-size:13px;font-weight:700;}
+    .add-btn-main {background:#2b81f7; color:#fff;border:none; font-weight:700; font-size:1em; padding:12px 18px;border-radius:13px;margin:15px 0;display:block;box-shadow:0 2px 12px #d7e4f540;width:100%;}
+    .modal-bg {position:fixed;z-index:10;top:0;left:0;width:100vw;height:100vh;background:#0006;display:flex;align-items:center;justify-content:center;}
+    .modal-card {background:#fff;border-radius:14px;box-shadow:0 4px 22px #b1d6fc42;width:320px;padding:22px 18px 12px;text-align:left;}
+    .modal-card h2 {font-size:18px;margin:0 0 14px;}
+    .modal-field {margin-bottom:14px;}
+    .modal-field input, .modal-field textarea {width:100%;font-size:15px;padding:9px 9px;border-radius:8px;border:1px solid #d7e4f5;outline:none;}
+    .modal-btns {display:flex;justify-content:flex-end;gap:15px;}
+    .modal-btn {padding:10px 21px;font-size:15px;font-weight:700;border-radius:10px;border:none;background:#2186e7;color:#fff;cursor:pointer;}
     .modal-btn.cancel {background:#f0f0f0;color:#205;}
-    .modal-photo {margin-bottom:4px;}
-    .modal-photo input {width:100%;}
-    .money-bg {position:fixed;pointer-events:none;left:0;top:0;width:100vw;height:100vh;z-index:0;overflow:hidden;}
-    .money-coin {position:absolute;font-size:22px;animation:float 10s linear infinite;opacity:0.45;}
-    @keyframes float {0%{transform:translateY(0) scale(0.9);}80%{opacity:0.75;}100%{transform:translateY(85vh) scale(1.11);opacity:0;}}
-    @media (max-width:480px) {.user-nick{font-size:13px;}.users-count{font-size:11px;}.search-bar input{font-size:11px;}.main-app{font-size:12px;}.ad-title{font-size:12px;}.add-btn-main{font-size:11px;}.modal-card{width:98vw;}}
-    .tg-warning {position:fixed;bottom:0;left:0;width:100vw;z-index:12000;background:#ffe7e7;color:#b31313;font-size:13px;font-weight:700;text-align:center;padding:12px 4px;box-shadow:0 -2px 12px #c1adad60;}
+    .hidden {display:none;}
+    .msg {padding:11px 9px;margin:7px 0;background:#fff4cc;border-radius:10px;color:#ae820c;text-align:center;}
   </style>
 </head>
 <body>
-  <!-- Loader -->
-  <div class="loader-bg" id="loader">
-    <img src="https://i.ibb.co/HLc01jWL/22c6c8c1-5106-4955-bec9-7c071a2a41e3.png" class="loader-img" alt="logo" />
-    <div class="loader-bar"><div class="loader-bar-inner"></div></div>
-  </div>
-
-  <div class="money-bg" id="money-bg"></div>
-
-  <div class="intro" id="intro">
-    <img src="https://i.ibb.co/HLc01jWL/22c6c8c1-5106-4955-bec9-7c071a2a41e3.png" alt="logo" style="width:70px;height:70px;border-radius:10px;box-shadow:0 6px 15px #90e0ff22;">
-    <h1 style="font-size:1.2em;margin:15px 0 8px 0;">👋 Вітаємо у <b>СамСобіШеф</b>!</h1>
-    <p style="font-size:0.99em;margin:0 0 12px;">
-      Telegram-мінідодаток для пошуку роботи та виконавців по Одесі та області.<br>
-      Ви можете <b>розмістити завдання</b> або <b>знайти підробіток</b> прямо тут.
-    </p>
-    <button class="btn-main" id="btn-continue" style="margin-top:10px;">Продовжити</button>
-  </div>
-
-  <div class="main-app fullscreen" id="main-app">
-    <div class="top-bar">
-      <div class="user-nick" id="user-nick">@User</div>
-      <div class="users-count" id="users-count">2369</div>
+  <div class="main-app" id="main-app">
+    <img src="https://i.ibb.co/HLc01jWL/22c6c8c1-5106-4955-bec9-7c071a2a41e3.png" class="logo" alt="logo"/>
+    <div id="auth-box">
+      <form class="login-form" id="login-form">
+        <h2>Вхід у СамСобіШеф</h2>
+        <input type="text" id="login-nick" placeholder="Ваш нік" required>
+        <button type="submit">Увійти</button>
+        <div class="switch" id="go-register">Немає акаунту? Зареєструватися</div>
+      </form>
+      <form class="reg-form hidden" id="reg-form">
+        <h2>Реєстрація</h2>
+        <input type="text" id="reg-nick" placeholder="Бажаний нік" required>
+        <input type="tel" id="reg-phone" placeholder="Телефон" required>
+        <button type="submit">Зареєструватися</button>
+        <div class="switch" id="go-login">Вже є акаунт? Увійти</div>
+      </form>
     </div>
-    <div class="search-bar">
-      <input type="text" id="search-input" placeholder="🔍 Пошук по завданням...">
-      <span class="search-icon">🔎</span>
+    <div id="user-panel" class="hidden">
+      <div class="user-top">
+        <span id="user-greet"></span>
+        <button class="add-btn-main" id="add-btn">Додати оголошення</button>
+      </div>
+      <div class="ads-list" id="ads-list"></div>
     </div>
-    <div class="ads-list" id="ads-list"></div>
-    <button class="add-btn-main" id="add-btn">Додати</button>
-    <div class="scroll-down" id="scroll-down">⬇️</div>
   </div>
-
-  <div class="modal-bg" id="add-modal">
+  <!-- Модалка додавання -->
+  <div class="modal-bg hidden" id="add-modal">
     <div class="modal-card">
       <h2>Додати оголошення</h2>
       <form id="add-form">
         <div class="modal-field"><textarea id="task-desc" placeholder="Опишіть завдання..." required></textarea></div>
         <div class="modal-field"><input type="number" min="0" id="task-price" placeholder="Ціна, грн" required></div>
-        <div class="modal-field"><input type="tel" id="task-phone" placeholder="Телефон" required pattern="[0-9\+\-\(\) ]+"></div>
-        <div class="modal-field modal-photo"><input type="file" accept="image/*" id="task-photo"></div>
-        <div class="modal-field"><button type="button" class="modal-btn" id="get-geo-btn">Додати геолокацію</button><span id="geo-status"></span></div>
+        <div class="modal-field"><input type="tel" id="task-phone" placeholder="Телефон" required></div>
         <div class="modal-btns">
           <button type="button" class="modal-btn cancel" id="cancel-modal">Скасувати</button>
           <button type="submit" class="modal-btn">Опублікувати</button>
@@ -108,142 +79,105 @@
       </form>
     </div>
   </div>
-  <div id="tg-warning" class="tg-warning" style="display:none;">
-    ❗️ Запустіть додаток через Telegram WebApp (кнопка в боті) для повної функціональності!
-  </div>
+  <div class="msg hidden" id="msg"></div>
   <script>
-    // Лоадер
-    setTimeout(() => {
-      document.getElementById('loader').style.display = 'none';
-      document.getElementById('intro').classList.add('show');
-    }, 4300);
+    // --- Простая авторизация и регистрация ---
+    function $(x) {return document.getElementById(x);}
+    function showMsg(txt) { $('msg').textContent = txt; $('msg').classList.remove('hidden'); setTimeout(()=>{$('msg').classList.add('hidden');},2000);}
+    let ads = [];
+    let user = null;
 
-    // Анимация денег
-    function createMoneyCoin() {
-      const icons = ["💸","💵","💶","💰","🪙"];
-      const el = document.createElement("div");
-      el.className = "money-coin";
-      el.textContent = icons[Math.floor(Math.random()*icons.length)];
-      el.style.left = Math.random() * 90 + "vw";
-      el.style.top = "-30px";
-      el.style.fontSize = (14 + Math.random()*12) + "px";
-      el.style.animationDuration = (5 + Math.random()*5) + "s";
-      document.getElementById('money-bg').appendChild(el);
-      setTimeout(()=>el.remove(),8000);
+    // --- Логика ---
+    function saveUser(u){localStorage.setItem('sshef_user',JSON.stringify(u));}
+    function loadUser(){let d=localStorage.getItem('sshef_user');return d?JSON.parse(d):null;}
+    function showPanel(){
+      $('auth-box').classList.add('hidden');
+      $('user-panel').classList.remove('hidden');
+      $('user-greet').textContent = '👤 '+user.nick+' | '+user.phone;
+      loadAds();
     }
-    setInterval(createMoneyCoin, 1200);
+    function showAuth(){
+      $('auth-box').classList.remove('hidden');
+      $('user-panel').classList.add('hidden');
+    }
 
-    // По кнопке "продовжити"
-    document.getElementById('btn-continue').onclick = function() {
-      document.getElementById('intro').style.display = 'none';
-      document.getElementById('main-app').style.display = 'block';
-      document.getElementById('main-app').classList.add('fullscreen');
-      checkTelegram();
-      // Репортим на backend (КТО зашел)
-      fetch('http://localhost:8097/visit', {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({user: window.userNick || "Гість"})
-      });
+    // --- Переключение форм ---
+    $('go-register').onclick = ()=>{ $('login-form').classList.add('hidden'); $('reg-form').classList.remove('hidden'); };
+    $('go-login').onclick = ()=>{ $('reg-form').classList.add('hidden'); $('login-form').classList.remove('hidden'); };
+
+    // --- Регистрация ---
+    $('reg-form').onsubmit = async function(e){
+      e.preventDefault();
+      let nick = $('reg-nick').value.trim();
+      let phone = $('reg-phone').value.trim();
+      if (!nick || !phone) return showMsg('Заповніть всі поля!');
+      // Проверка уникальности ника
+      let resp = await fetch('http://localhost:8097/check_nick', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nick})});
+      let data = await resp.json();
+      if (!data.ok) return showMsg('Такий нік вже існує!');
+      user = {nick, phone};
+      saveUser(user);
+      $('reg-form').reset();
+      showPanel();
+      await fetch('http://localhost:8097/visit', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(user)});
+    };
+    // --- Вход ---
+    $('login-form').onsubmit = async function(e){
+      e.preventDefault();
+      let nick = $('login-nick').value.trim();
+      if (!nick) return showMsg('Введіть нік!');
+      // Проверка существования ника
+      let resp = await fetch('http://localhost:8097/check_nick', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nick,check_exist:true})});
+      let data = await resp.json();
+      if (!data.ok) return showMsg('Такого ніку не знайдено!');
+      // Подгружаем номер
+      user = {nick, phone:data.phone||""};
+      saveUser(user);
+      showPanel();
+    };
+    // --- Проверка сессии ---
+    window.onload = function(){
+      user = loadUser();
+      if (user) showPanel(); else showAuth();
     };
 
-    // Имя пользователя из Telegram WebApp
-    let userNick = "Гість";
-    function checkTelegram() {
-      if (window.Telegram && Telegram.WebApp && Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
-        let u = Telegram.WebApp.initDataUnsafe.user;
-        userNick = u.username ? "@" + u.username : (u.first_name ? u.first_name : "Гість");
-        document.getElementById('user-nick').textContent = userNick;
-        document.getElementById('tg-warning').style.display = 'none';
-      } else {
-        userNick = "Гість";
-        document.getElementById('user-nick').textContent = "Гість";
-        document.getElementById('tg-warning').style.display = 'block';
-      }
-      window.userNick = userNick;
+    // --- Загрузка объявлений ---
+    async function loadAds(){
+      let resp = await fetch('http://localhost:8097/ads');
+      let data = await resp.json();
+      ads = data;
+      renderAds();
     }
-
-    let usersCount = 2369;
-    function updateUsersCount(n) {usersCount+=n;document.getElementById('users-count').textContent=usersCount;}
-    let ads = [
-      {id:1,desc:"Потрібно пофарбувати паркан у дворі.",price:900,phone:"093 123 45 67",time:"сьогодні, 10:21",likes:3,views:44,geo:null,photo:null,user:"@tanya_job"},
-      {id:2,desc:"Зібрати меблі. Вечір.",price:400,phone:"095 888 33 55",time:"сьогодні, 09:50",likes:8,views:77,geo:null,photo:null,user:"@den_od"},
-      {id:3,desc:"Вивезти будівельне сміття з квартири.",price:600,phone:"068 789 14 33",time:"вчора, 16:01",likes:4,views:52,geo:{lat:46.4825,lon:30.7233},photo:null,user:"@vova_help"}
-    ];
-    function renderAds(list) {
-      const wrap = document.getElementById('ads-list');wrap.innerHTML='';
-      list.forEach(ad=>{
-        let adHTML = `<div class="ad-card" id="ad-${ad.id}">
+    // --- Рендер ---
+    function renderAds(){
+      let wrap = $('ads-list');
+      wrap.innerHTML = '';
+      if(!ads.length) wrap.innerHTML='<div style="text-align:center;color:#8a8c9b;">Оголошень ще немає...</div>';
+      ads.forEach(ad=>{
+        let adHTML = `<div class="ad-card">
           <div class="ad-title">${ad.desc}</div>
-          <div class="ad-meta">💰 <b>${ad.price}</b> грн <span class="ad-time"> | ${ad.time}</span></div>
-          ${ad.photo ? `<img src="${ad.photo}" class="ad-photo" />` : ''}
-          ${ad.geo ? `<div style="margin-bottom:4px;"><a href="https://www.google.com/maps/search/?api=1&query=${ad.geo.lat},${ad.geo.lon}" target="_blank" style="color:#2073d3;text-decoration:underline;">📍 Мапа</a></div>` : ''}
+          <div class="ad-meta">💰 <b>${ad.price}</b> грн | ${ad.phone} | ${ad.user}</div>
           <div class="ad-actions">
-            <div>
-              <span class="ad-likes" onclick="likeAd(${ad.id},this)">❤️ <span>${ad.likes}</span></span>
-              <span class="ad-views">👁️ ${ad.views}</span>
-            </div>
-            <button class="ad-btn" onclick="takeJob(${ad.id})">Виконати</button>
+            <div><span class="ad-likes">❤️ <span>${ad.likes}</span></span>
+            <span class="ad-views">👁️ ${ad.views||1}</span></div>
           </div>
         </div>`;
         wrap.innerHTML += adHTML;
       });
     }
-    renderAds(ads);
 
-    window.likeAd = function(id, el) {
-      let ad = ads.find(x=>x.id===id);
-      if (ad) {ad.likes+=1;el.classList.add('liked');el.querySelector('span').textContent=ad.likes;}
-    };
-
-    document.getElementById('search-input').oninput = function() {
-      const q = this.value.toLowerCase();
-      renderAds(ads.filter(ad=>ad.desc.toLowerCase().includes(q)));
-    };
-
-    // Кнопка вниз при скролле
-    const adsList = document.getElementById('ads-list');
-    const scrollDownBtn = document.getElementById('scroll-down');
-    adsList.onscroll = function() {if(adsList.scrollTop>100)scrollDownBtn.style.display='flex';else scrollDownBtn.style.display='none';};
-    scrollDownBtn.onclick = function() {adsList.scrollTo({top:100000,behavior:'smooth'});};
-
-    // Добавить объявление (модалка)
-    let geo = null, photoBase64 = null;
-    document.getElementById('add-btn').onclick = function() {document.getElementById('add-modal').classList.add('show');};
-    document.getElementById('cancel-modal').onclick = function() {document.getElementById('add-modal').classList.remove('show');geo=null;photoBase64=null;document.getElementById('add-form').reset();};
-    document.getElementById('get-geo-btn').onclick = function() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(pos){
-          geo={lat:pos.coords.latitude,lon:pos.coords.longitude};
-          document.getElementById('geo-status').textContent="✅";
-        },()=>{document.getElementById('geo-status').textContent="❌";});
-      } else {document.getElementById('geo-status').textContent="⛔";}
-    };
-    document.getElementById('task-photo').onchange = function(e) {
-      const file = e.target.files[0];
-      if (file) {const reader=new FileReader();reader.onload=function(evt){photoBase64=evt.target.result;};reader.readAsDataURL(file);}
-    };
-    document.getElementById('add-form').onsubmit = async function(e) {
+    // --- Добавить объявление ---
+    $('add-btn').onclick = ()=>{ $('add-modal').classList.remove('hidden'); };
+    $('cancel-modal').onclick = ()=>{ $('add-modal').classList.add('hidden'); $('add-form').reset();};
+    $('add-form').onsubmit = async function(e){
       e.preventDefault();
-      document.getElementById('add-modal').classList.remove('show');
-      alert('⏳ Ваше оголошення на перевірці! Очікуйте пару хвилин…');
-      // Отправка админу через backend
-      const payload = {
-        desc: document.getElementById('task-desc').value,
-        price: document.getElementById('task-price').value,
-        phone: document.getElementById('task-phone').value,
-        geo, photo: photoBase64, user: window.userNick || "Гість"
-      };
-      await fetch('http://localhost:8097/new_ad', {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify(payload)
-      });
-    };
-    window.takeJob = function(id) {
-      const ad = ads.find(x=>x.id===id);
-      if (!ad) return;
-      if (confirm('Підтвердити взяття у роботу?')) {
-        alert('Ваш запит на виконання завдання відправлено автору!');
-      }
+      let desc=$('task-desc').value,price=$('task-price').value,phone=$('task-phone').value;
+      if(!desc||!price||!phone)return showMsg('Всі поля обовʼязкові!');
+      let payload = {desc, price, phone, user:user.nick};
+      let resp = await fetch('http://localhost:8097/new_ad', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      $('add-modal').classList.add('hidden');$('add-form').reset();
+      if ((await resp.json()).ok) showMsg('На модерації!');
+      else showMsg('Помилка сервера!');
     };
   </script>
 </body>
