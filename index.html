@@ -4,13 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>СамСобіШеф | Робота в Одесі</title>
-  <meta name="description" content="СамСобіШеф — платформа для пошуку підробітку та виконавців в Одесі та області. Додавайте завдання, вказуйте телефон та ціну — і чекайте на відгуки!">
+  <meta name="description" content="СамСобіШеф — пошук підробітку та виконавців в Одесі та області. Додавайте завдання та знаходьте роботу!">
   <link rel="icon" type="image/png" href="https://i.ibb.co/HLc01jWL/22c6c8c1-5106-4955-bec9-7c071a2a41e3.png"/>
   <style>
     body {font-family: Arial,sans-serif; background:#f5f7fc; margin:0; padding:0;}
     .main-app {max-width:430px; margin:44px auto 0; padding:0 6px;}
     .logo {width:84px; display:block; margin:16px auto 18px; border-radius:22px;}
     .add-btn-main {background:#2b81f7; color:#fff; border:none; font-weight:700; font-size:1.14em; padding:12px 18px; border-radius:13px; margin:24px auto; display:block; box-shadow:0 2px 12px #d7e4f540; width:100%;transition:.25s;}
+    .ads-list {margin-top:22px;}
+    .ad-card {background:#fff; border-radius:13px; padding:13px 13px 8px 13px; margin-bottom:12px; box-shadow:0 1px 9px #dbe3f330;}
+    .ad-title {font-size:16px; margin-bottom:5px; font-weight:600;}
+    .ad-meta {font-size:13px; color:#3167ae; margin-bottom:3px;}
+    .ad-actions {display:flex; align-items:center; justify-content:space-between;}
+    .ad-likes {font-size:14px; cursor:pointer; color:#2093e7; display:flex; align-items:center;}
+    .ad-likes.liked {color:#ffad3d;}
+    .ad-likes span {margin-left:3px;}
+    .ad-views {font-size:13px; color:#b6cbe8;}
     .modal-bg {position:fixed;z-index:10;top:0;left:0;width:100vw;height:100vh;background:#0005;display:flex;align-items:center;justify-content:center;animation:fadeIn .7s;transition:.4s;opacity:0;pointer-events:none;}
     .modal-bg.show {opacity:1; pointer-events:all;}
     .modal-card {background:#fff; border-radius:17px; box-shadow:0 4px 28px #b1d6fc45; width:340px; padding:26px 18px 12px; text-align:left; animation:popin .5s;}
@@ -25,12 +34,14 @@
     .msg.show {opacity:1;}
     .fadein {animation:fadeIn .8s;}
     @keyframes fadeIn {from{opacity:0;}to{opacity:1;}}
+    @media (max-width:500px) {.main-app {margin-top:14px;}}
   </style>
 </head>
 <body>
   <div class="main-app fadein" id="main-app">
     <img src="https://i.ibb.co/HLc01jWL/22c6c8c1-5106-4955-bec9-7c071a2a41e3.png" class="logo" alt="logo"/>
     <button class="add-btn-main" id="add-btn">Додати оголошення</button>
+    <div class="ads-list" id="ads-list"></div>
   </div>
   <!-- Модалка додавання -->
   <div class="modal-bg" id="add-modal">
@@ -42,43 +53,73 @@
         <div class="modal-field"><input type="tel" id="task-phone" placeholder="Телефон" required></div>
         <div class="modal-btns">
           <button type="button" class="modal-btn cancel" id="cancel-modal">Скасувати</button>
-          <button type="submit" class="modal-btn">Відправити</button>
+          <button type="submit" class="modal-btn">Опублікувати</button>
         </div>
       </form>
     </div>
   </div>
   <div class="msg" id="msg"></div>
   <script>
-    // Укажи свой сервер (Cloudflare tunnel, например)
-    const SERVER = 'https://internet-ahead-reviewed-bacterial.trycloudflare.com';
-
     function $(x) {return document.getElementById(x);}
     function showMsg(txt) {
       $('msg').textContent = txt;
       $('msg').classList.add('show');
       setTimeout(()=>{$('msg').classList.remove('show');},2700);
     }
+    // Загрузка объявлений из localStorage
+    function loadAds() {
+      let a = localStorage.getItem('sshef_ads');
+      return a ? JSON.parse(a) : [];
+    }
+    // Сохранение объявлений в localStorage
+    function saveAds(ads) {
+      localStorage.setItem('sshef_ads', JSON.stringify(ads));
+    }
+    // Проверка украинского номера
     function validUAphone(phone) {
       let p = phone.replace(/\D/g, '');
       return (/^380\d{9}$/.test(p) || /^0\d{9}$/.test(p));
     }
+    // Отрисовка объявлений
+    function renderAds() {
+      let wrap = $('ads-list');
+      let ads = loadAds();
+      if(!ads.length) {
+        wrap.innerHTML = '<div style="text-align:center;color:#8a8c9b;">Оголошень ще немає...</div>';
+        return;
+      }
+      wrap.innerHTML = '';
+      ads.forEach(ad=>{
+        let adHTML = `<div class="ad-card">
+          <div class="ad-title">${ad.desc}</div>
+          <div class="ad-meta">💰 <b>${ad.price}</b> грн | ${ad.phone}</div>
+          <div class="ad-meta" style="font-size:12px;">${ad.time}</div>
+        </div>`;
+        wrap.innerHTML += adHTML;
+      });
+    }
+    // События
     $('add-btn').onclick = ()=>{ $('add-modal').classList.add('show'); };
     $('cancel-modal').onclick = ()=>{ $('add-modal').classList.remove('show'); $('add-form').reset();};
-    $('add-form').onsubmit = async function(e){
+    $('add-form').onsubmit = function(e){
       e.preventDefault();
       let desc=$('task-desc').value.trim(),price=$('task-price').value.trim(),phone=$('task-phone').value.trim();
       if(desc.length<10)return showMsg('Опис має бути від 10 символів!');
       if(!validUAphone(phone))return showMsg('Телефон некоректний!');
-      let payload = {desc, price, phone};
-      let resp = await fetch(SERVER+'/tg_notify', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(payload)
-      });
+      let ads = loadAds();
+      let ad = {
+        desc: desc,
+        price: price,
+        phone: phone,
+        time: new Date().toLocaleString("uk-UA")
+      };
+      ads.unshift(ad); // Новое наверху
+      saveAds(ads);
       $('add-modal').classList.remove('show');$('add-form').reset();
-      if ((await resp.json()).ok) showMsg('Ваше оголошення відправлено адміністратору!');
-      else showMsg('Помилка сервера!');
+      showMsg('Оголошення додано!');
+      renderAds();
     };
+    window.onload = renderAds;
   </script>
 </body>
 </html>
