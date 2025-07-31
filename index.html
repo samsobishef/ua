@@ -1,1 +1,358 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>СамСобіШеф | Робота Одеса</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Arial:wght@700&display=swap');
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff;
+      margin: 0;
+      padding: 0;
+      color: #193a6b;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+    .loader-bg {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #fff; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      animation: fadeOut 1.2s 4.7s forwards;
+    }
+    @keyframes fadeOut { to { opacity: 0; pointer-events: none; }}
+    .loader-img {
+      width: 150px; border-radius: 24px; margin-bottom: 30px; box-shadow: 0 8px 40px #d2e7ff90;
+      animation: appear 1.2s;
+    }
+    @keyframes appear { 0%{opacity:0;transform:scale(0.9);} 100%{opacity:1;transform:scale(1);} }
+    .loader-bar {
+      width: 160px; height: 8px; border-radius: 8px; background: #d0e1fa;
+      overflow: hidden; margin-top: 8px;
+    }
+    .loader-bar-inner {
+      width: 0; height: 100%; background: linear-gradient(90deg, #2186e7, #1ab0f9);
+      animation: load-bar 4s linear forwards;
+    }
+    @keyframes load-bar { 100% { width: 100%; } }
+
+    .intro {
+      padding: 40px 15px 15px 15px; text-align: center;
+      display: none;
+      animation: fadeIn 1.5s;
+    }
+    .intro.show { display: block;}
+    @keyframes fadeIn {from{opacity:0;}to{opacity:1;}}
+
+    .btn-main {
+      padding: 16px 32px; background: linear-gradient(90deg,#2186e7,#1ab0f9); color: #fff; border: none; border-radius: 16px; font-size: 20px; font-weight: 700; margin: 24px auto 0; display: block; cursor: pointer; box-shadow: 0 4px 24px #d1e6ff50; transition: transform 0.1s;
+    }
+    .btn-main:active { transform: scale(0.98); }
+
+    .main-app { display: none; }
+    .top-bar {
+      display: flex; align-items: center; padding: 18px 16px 10px 8px; justify-content: space-between;
+    }
+    .user-nick { font-size: 19px; font-weight: bold; background: #e6f0ff; padding: 8px 22px 8px 40px; border-radius: 24px; position: relative; }
+    .user-nick:before {
+      content: '👤'; position: absolute; left: 10px; top: 7px; font-size: 18px;
+    }
+    .users-count { font-size: 18px; font-weight: 700; background: #f4f7ff; border-radius: 16px; padding: 7px 20px; color: #2073d3;}
+    .search-bar {
+      margin: 0 auto 15px auto; max-width: 420px; display: flex; align-items: center; position: relative;
+    }
+    .search-bar input {
+      width: 100%; font-size: 18px; padding: 10px 36px 10px 15px; border-radius: 18px; border: 1px solid #d7e4f5; outline: none; margin-right: 12px;
+    }
+    .search-icon { position: absolute; right: 12px; top: 7px; font-size: 20px; color: #2186e7; }
+
+    .ads-list { max-width: 520px; margin: 0 auto; min-height: 350px; padding-bottom: 70px; position: relative; }
+    .ad-card {
+      background: #f4f7ff; border-radius: 18px; padding: 16px 12px 12px; margin-bottom: 22px; box-shadow: 0 2px 10px #dae7fb36; position: relative; transition: box-shadow 0.2s;
+    }
+    .ad-title { font-size: 18px; margin-bottom: 6px; font-weight: 600;}
+    .ad-meta { font-size: 14px; color: #27569e; margin-bottom: 5px;}
+    .ad-photo { width: 96%; border-radius: 14px; margin-bottom: 8px; margin-top: 6px; box-shadow: 0 4px 16px #b4d4ff40;}
+    .ad-time { font-size: 12px; color: #888; margin-right: 8px;}
+    .ad-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 10px;}
+    .ad-likes { font-size: 17px; cursor: pointer; color: #2093e7; display: flex; align-items: center; }
+    .ad-likes.liked { color: #ffad3d; }
+    .ad-likes span { margin-left: 4px; }
+    .ad-views { font-size: 14px; color: #b6cbe8;}
+    .ad-btn { padding: 8px 16px; background: #2b81f7; color: #fff; border: none; border-radius: 12px; cursor: pointer; font-size: 15px; font-weight: 700; transition: background 0.12s;}
+    .ad-btn:active { background: #1562be;}
+
+    .add-btn-main {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); padding: 14px 42px; border-radius: 24px; background: linear-gradient(90deg,#2186e7,#1ab0f9); color: #fff; font-size: 22px; font-weight: 700; box-shadow: 0 8px 28px #b4c4ee4d; border: none; cursor: pointer; z-index: 10;
+    }
+    .scroll-down {
+      display: none; position: fixed; right: 16px; bottom: 80px; z-index: 20; background: #f6faff; border-radius: 50%; box-shadow: 0 3px 16px #99cdfd40; width: 50px; height: 50px; align-items: center; justify-content: center; font-size: 26px; color: #2186e7; cursor: pointer;
+      animation: fadeInDown 0.3s;
+    }
+    @keyframes fadeInDown {from{opacity:0;transform:translateY(40px);}to{opacity:1;transform:translateY(0);}}
+
+    /* Add Modal */
+    .modal-bg {
+      position: fixed; z-index: 101; top: 0; left: 0; width: 100vw; height: 100vh; background: #0005; display: flex; align-items: center; justify-content: center; animation: fadeIn 0.6s;
+      display: none;
+    }
+    .modal-bg.show { display: flex;}
+    .modal-card {
+      background: #fff; border-radius: 22px; box-shadow: 0 8px 44px #b1d6fc42; max-width: 98vw; width: 370px; padding: 32px 20px 22px; position: relative; text-align: left; animation: appear 0.5s;
+    }
+    .modal-card h2 {font-size: 22px; margin: 0 0 14px 0;}
+    .modal-field { margin-bottom: 16px;}
+    .modal-field input, .modal-field textarea { width: 100%; font-size: 17px; padding: 10px; border-radius: 10px; border: 1px solid #d7e4f5; outline: none;}
+    .modal-btns { display: flex; justify-content: flex-end; gap: 15px;}
+    .modal-btn { padding: 11px 28px; font-size: 17px; font-weight: 700; border-radius: 12px; border: none; background: #2186e7; color: #fff; cursor: pointer;}
+    .modal-btn.cancel { background: #f0f0f0; color: #205;}
+    .modal-photo { margin-bottom: 6px;}
+    .modal-photo input { width: 100%;}
+
+    /* Anim money on bg */
+    .money-bg {
+      position: fixed; pointer-events: none; left: 0; top: 0; width: 100vw; height: 100vh; z-index: 0;
+      overflow: hidden;
+    }
+    .money-coin {
+      position: absolute; font-size: 36px; animation: float 10s linear infinite; opacity: 0.55;
+    }
+    @keyframes float {
+      0% {transform: translateY(0) scale(0.95);}
+      80% {opacity: 0.75;}
+      100% {transform: translateY(95vh) scale(1.13); opacity: 0;}
+    }
+
+    /* Adaptive */
+    @media (max-width: 480px) {
+      .user-nick {font-size: 17px;}
+      .users-count {font-size: 15px;}
+      .search-bar input {font-size: 16px;}
+      .main-app {font-size: 16px;}
+      .ad-title {font-size: 15px;}
+      .add-btn-main {font-size: 18px;}
+      .modal-card {width: 98vw;}
+    }
+  </style>
+</head>
+<body>
+  <!-- Loader -->
+  <div class="loader-bg" id="loader">
+    <img src="https://i.ibb.co/HLc01jWL/22c6c8c1-5106-4955-bec9-7c071a2a41e3.png" class="loader-img" alt="logo" />
+    <div class="loader-bar"><div class="loader-bar-inner"></div></div>
+  </div>
+
+  <!-- Анимация денег -->
+  <div class="money-bg" id="money-bg"></div>
+
+  <!-- Intro/Welcome -->
+  <div class="intro" id="intro">
+    <h1>👋 Вітаємо у <b>СамСобіШеф</b>!</h1>
+    <p>Це перше Telegram-мінідодаток для пошуку роботи та виконавців по Одесі та області.<br>
+    Ви можете <b>розмістити завдання</b> або <b>знайти підробіток</b> прямо тут.<br><br>
+    <span style="color:#2073d3;">• Роботодавці і виконавці</span><br>
+    <span style="color:#2073d3;">• Публікація оголошень за пару секунд</span><br>
+    <span style="color:#2073d3;">• Перевірка і підтвердження модератором</span></p>
+    <button class="btn-main" id="btn-continue">Продовжити</button>
+  </div>
+
+  <!-- Основное приложение -->
+  <div class="main-app" id="main-app">
+    <div class="top-bar">
+      <div class="user-nick" id="user-nick">@User</div>
+      <div class="users-count" id="users-count">2369</div>
+    </div>
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="🔍 Пошук по завданням...">
+      <span class="search-icon">🔎</span>
+    </div>
+    <div class="ads-list" id="ads-list"></div>
+    <button class="add-btn-main" id="add-btn">Додати</button>
+    <div class="scroll-down" id="scroll-down">⬇️</div>
+  </div>
+
+  <!-- Модалка для добавления -->
+  <div class="modal-bg" id="add-modal">
+    <div class="modal-card">
+      <h2>Додати оголошення</h2>
+      <form id="add-form">
+        <div class="modal-field">
+          <textarea id="task-desc" placeholder="Опишіть завдання..." required></textarea>
+        </div>
+        <div class="modal-field">
+          <input type="number" min="0" id="task-price" placeholder="Ціна, грн" required>
+        </div>
+        <div class="modal-field">
+          <input type="tel" id="task-phone" placeholder="Телефон" required pattern="[0-9\+\-\(\) ]+">
+        </div>
+        <div class="modal-field modal-photo">
+          <input type="file" accept="image/*" id="task-photo">
+        </div>
+        <div class="modal-field">
+          <button type="button" class="modal-btn" id="get-geo-btn">Додати геолокацію</button>
+          <span id="geo-status"></span>
+        </div>
+        <div class="modal-btns">
+          <button type="button" class="modal-btn cancel" id="cancel-modal">Скасувати</button>
+          <button type="submit" class="modal-btn">Опублікувати</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ——— 1. Лоадер и старт
+    setTimeout(() => {
+      document.getElementById('loader').style.display = 'none';
+      document.getElementById('intro').classList.add('show');
+    }, 5200);
+
+    // ——— 2. Money background anim
+    function createMoneyCoin() {
+      const icons = ["💸","💵","💶","💰","🪙"];
+      const el = document.createElement("div");
+      el.className = "money-coin";
+      el.textContent = icons[Math.floor(Math.random()*icons.length)];
+      el.style.left = Math.random() * 90 + "vw";
+      el.style.top = "-50px";
+      el.style.fontSize = (28 + Math.random()*22) + "px";
+      el.style.animationDuration = (6 + Math.random()*7) + "s";
+      document.getElementById('money-bg').appendChild(el);
+      setTimeout(()=>el.remove(),12000);
+    }
+    setInterval(createMoneyCoin, 1100);
+
+    // ——— 3. Welcome > Main App
+    document.getElementById('btn-continue').onclick = function() {
+      document.getElementById('intro').style.display = 'none';
+      document.getElementById('main-app').style.display = 'block';
+    };
+
+    // ——— 4. Получение username из Telegram WebApp
+    let userNick = "@User";
+    if (window.Telegram && Telegram.WebApp && Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user && Telegram.WebApp.initDataUnsafe.user.username) {
+      userNick = "@" + Telegram.WebApp.initDataUnsafe.user.username;
+    }
+    document.getElementById('user-nick').textContent = userNick;
+
+    // ——— 5. Users count
+    let usersCount = 2369;
+    function updateUsersCount(n) {
+      usersCount += n; document.getElementById('users-count').textContent = usersCount;
+    }
+    // На каждое новое подключение можно дергать updateUsersCount(1);
+
+    // ——— 6. Dummy объявления для примера
+    let ads = [
+      {id:1,desc:"Потрібно пофарбувати паркан у дворі.",price:900,phone:"093 123 45 67",time:"сьогодні, 10:21",likes:3,views:44,geo:null,photo:null,user:"@tanya_job"},
+      {id:2,desc:"Зібрати меблі. Вечір.",price:400,phone:"095 888 33 55",time:"сьогодні, 09:50",likes:8,views:77,geo:null,photo:null,user:"@den_od"},
+      {id:3,desc:"Вивезти будівельне сміття з квартири.",price:600,phone:"068 789 14 33",time:"вчора, 16:01",likes:4,views:52,geo:{lat:46.4825,lon:30.7233},photo:null,user:"@vova_help"}
+    ];
+
+    // ——— 7. Рендер объявлений
+    function renderAds(list) {
+      const wrap = document.getElementById('ads-list');
+      wrap.innerHTML = '';
+      list.forEach(ad=>{
+        let adHTML = `<div class="ad-card" id="ad-${ad.id}">
+          <div class="ad-title">${ad.desc}</div>
+          <div class="ad-meta">💰 <b>${ad.price}</b> грн <span class="ad-time"> | ${ad.time}</span></div>
+          ${ad.photo ? `<img src="${ad.photo}" class="ad-photo" />` : ''}
+          ${ad.geo ? `<div style="margin-bottom:7px;"><a href="https://www.google.com/maps/search/?api=1&query=${ad.geo.lat},${ad.geo.lon}" target="_blank" style="color:#2073d3;text-decoration:underline;">📍 Глянути на мапі</a></div>` : ''}
+          <div class="ad-actions">
+            <div>
+              <span class="ad-likes" onclick="likeAd(${ad.id},this)">❤️ <span>${ad.likes}</span></span>
+              <span class="ad-views">👁️ ${ad.views}</span>
+            </div>
+            <button class="ad-btn" onclick="takeJob(${ad.id})">Виконати</button>
+          </div>
+        </div>`;
+        wrap.innerHTML += adHTML;
+      });
+    }
+    renderAds(ads);
+
+    // ——— 8. Like logic
+    window.likeAd = function(id, el) {
+      let ad = ads.find(x=>x.id===id);
+      if (ad) {
+        ad.likes += 1;
+        el.classList.add('liked');
+        el.querySelector('span').textContent = ad.likes;
+      }
+    };
+
+    // ——— 9. Поиск
+    document.getElementById('search-input').oninput = function() {
+      const q = this.value.toLowerCase();
+      renderAds(ads.filter(ad=>ad.desc.toLowerCase().includes(q)));
+    };
+
+    // ——— 10. Кнопка вниз при скролле
+    const adsList = document.getElementById('ads-list');
+    const scrollDownBtn = document.getElementById('scroll-down');
+    adsList.onscroll = function() {
+      if (adsList.scrollTop > 180) scrollDownBtn.style.display = 'flex';
+      else scrollDownBtn.style.display = 'none';
+    };
+    scrollDownBtn.onclick = function() { adsList.scrollTo({top:100000,behavior:'smooth'}); };
+
+    // ——— 11. Добавить объявление (модалка)
+    let geo = null, photoBase64 = null;
+    document.getElementById('add-btn').onclick = function() {
+      document.getElementById('add-modal').classList.add('show');
+    };
+    document.getElementById('cancel-modal').onclick = function() {
+      document.getElementById('add-modal').classList.remove('show');
+      geo = null; photoBase64 = null; document.getElementById('add-form').reset();
+    };
+    document.getElementById('get-geo-btn').onclick = function() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(pos){
+          geo = {lat:pos.coords.latitude, lon:pos.coords.longitude};
+          document.getElementById('geo-status').textContent = "✅ Додано!";
+        },()=>{document.getElementById('geo-status').textContent = "❌ Відмовлено";});
+      } else {
+        document.getElementById('geo-status').textContent = "⛔ Не підтримується";
+      }
+    };
+    document.getElementById('task-photo').onchange = function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt){ photoBase64 = evt.target.result; };
+        reader.readAsDataURL(file);
+      }
+    };
+    // ——— 12. Submit объявления
+    document.getElementById('add-form').onsubmit = async function(e) {
+      e.preventDefault();
+      // Показываем "ОЧІКУЙТЕ"
+      document.getElementById('add-modal').classList.remove('show');
+      alert('⏳ Ваше оголошення на перевірці! Очікуйте пару хвилин…');
+      // Отправляем админу через backend
+      const payload = {
+        desc: document.getElementById('task-desc').value,
+        price: document.getElementById('task-price').value,
+        phone: document.getElementById('task-phone').value,
+        geo, photo: photoBase64, user: userNick
+      };
+      await fetch('http://localhost:8097/new_ad', {
+        method:'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      });
+    };
+
+    // ——— 13. Принять работу
+    window.takeJob = function(id) {
+      const ad = ads.find(x=>x.id===id);
+      if (!ad) return;
+      if (confirm('Підтвердити взяття у роботу?')) {
+        // тут надо отправить на backend что юзер взял задание, уведомить автора
+        alert('Ваш запит на виконання завдання відправлено автору!');
+      }
+    };
+  </script>
+</body>
+</html>
 
