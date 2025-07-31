@@ -42,7 +42,7 @@
       justify-content: center;
       align-items: center;
       margin: 0 auto 6px;
-      padding-top: 14px;
+      padding-top: 10px;
     }
     .search-inp {
       width: 100%;
@@ -53,7 +53,7 @@
       outline: none;
       background: #f6faff;
       box-sizing: border-box;
-      margin-bottom: 3px;
+      margin-bottom: 2px;
       margin-top: 0;
     }
     .ads-container-outer {
@@ -69,16 +69,16 @@
       max-width: 430px;
       margin: 0 auto;
       background: var(--card-bg);
-      border-radius: 20px 20px 0 0;
+      border-radius: 19px 19px 0 0;
       box-shadow: 0 2px 24px #e3effc38;
-      padding: 10px 0 0 0;
+      padding: 5px 0 0 0;
       overflow-y: auto;
       min-height: 210px;
-      max-height: 65vh;
+      max-height: 62vh;
       position: relative;
       display: flex;
       flex-direction: column;
-      margin-bottom: 78px;
+      margin-bottom: 75px;
       scrollbar-width: thin;
       scrollbar-color: #acd4ff #fff;
     }
@@ -94,12 +94,13 @@
     .ad-card {
       background: #fafdff;
       border-radius: 13px;
-      padding: 14px 14px 8px 14px;
+      padding: 12px 12px 7px 12px;
       box-shadow: 0 1px 7px #dbe3f324;
       text-align: left;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 3px;
+      word-break: break-word;
     }
     .ad-title {
       font-size: 16px;
@@ -124,20 +125,21 @@
       margin-bottom: 2px;
     }
     .ad-img {
-      max-width: 130px;
-      max-height: 90px;
-      margin-bottom: 7px;
+      max-width: 115px;
+      max-height: 85px;
+      margin-bottom: 5px;
       border-radius: 7px;
       background: #dde5ef;
       object-fit: cover;
       box-shadow: 0 2px 10px #acd4ff1a;
+      display: block;
     }
     .add-btn-main {
       background: var(--primary);
       color: #fff;
       border: none;
       font-weight: 700;
-      font-size: 1.13em;
+      font-size: 1.09em;
       padding: 15px 18px 15px 18px;
       border-radius: 17px 17px 0 0;
       margin: 0 auto;
@@ -164,22 +166,22 @@
       border-radius: 22px;
       box-shadow: 0 6px 32px #b1d6fc45;
       width: 335px;
-      padding: 22px 14px 12px;
+      padding: 18px 14px 9px;
       text-align: left;
       animation: popin .5s;
       margin: 0 auto;
     }
     @keyframes popin { 0% { transform: scale(.91); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     .modal-card h2 {
-      font-size: 18px; margin: 0 0 16px; font-weight: 700;
+      font-size: 18px; margin: 0 0 13px; font-weight: 700;
       color: #174ea6;
       text-align: center;
     }
-    .modal-field { margin-bottom: 15px; }
+    .modal-field { margin-bottom: 12px; }
     .modal-field input, .modal-field textarea {
       width: 100%;
       font-size: 15px;
-      padding: 9px 9px;
+      padding: 8px 9px;
       border-radius: 8px;
       border: 1px solid #d7e4f5;
       outline: none;
@@ -188,7 +190,7 @@
       box-sizing: border-box;
     }
     .geo-btn {
-      margin: 6px 0 0 0;
+      margin: 5px 0 0 0;
       display: inline-block;
       font-size: 13px;
       background: #edfaff;
@@ -267,8 +269,8 @@
       transition: .5s;
     }
     .preloader-logo {
-      width: 230px;
-      margin-bottom: 45px;
+      width: 220px;
+      margin-bottom: 40px;
       margin-top: -60px;
       border-radius: 36px;
       background: var(--logo-bg);
@@ -276,11 +278,11 @@
       object-fit: contain;
     }
     .loader-bar-wrap {
-      width: 210px; height: 8px;
+      width: 165px; height: 7px;
       background: #e3eefe;
       border-radius: 8px;
       overflow: hidden;
-      margin-bottom: 40px;
+      margin-bottom: 36px;
     }
     .loader-bar {
       height: 100%; width: 0;
@@ -294,8 +296,8 @@
       .add-btn-main { max-width: 100vw; font-size: 1em;}
       .search-wrap, .ads-window { max-width: 99vw;}
       .preloader-bg { padding-bottom: 100px; }
-      .preloader-logo { width: 60vw; }
-      .loader-bar-wrap { width: 65vw;}
+      .preloader-logo { width: 59vw; }
+      .loader-bar-wrap { width: 49vw;}
       .modal-card { width: 97vw; min-width: 0;}
     }
   </style>
@@ -396,6 +398,7 @@
         return;
       }
       wrap.innerHTML = '';
+      // Отображаем снизу вверх (новые внизу!)
       ads.forEach(ad=>{
         let price = (ad.price && ad.price !== "undefined") ? ad.price : '—';
         let geoHTML = ad.geo ? `<div class="ad-geo"><a href="https://maps.google.com/?q=${ad.geo}" target="_blank" style="color:#26a;text-decoration:underline;">📍 Геолокація</a></div>` : '';
@@ -406,20 +409,19 @@
               ${geoHTML}
               <div class="ad-meta2">${ad.time||''}</div>
             </div>`;
-        wrap.innerHTML += adHTML;
+        wrap.innerHTML = adHTML + wrap.innerHTML;
       });
       setTimeout(()=>{$('ads-window').scrollTop = $('ads-window').scrollHeight;},60);
     }
-    $('search-inp').oninput = function(){ updateAds(this.value); };
-    $('add-btn').onclick = ()=>{ $('add-modal').classList.add('show');}
-    $('cancel-modal').onclick = ()=>{ $('add-modal').classList.remove('show'); $('add-form').reset();$('geo-ok').style.display='none';$('task-geo').value='';};
-    // --- Геолокация ---
-    let geo = '';
-    $('geo-btn').onclick = function(e){
-      e.preventDefault();
+    $('search-inp').oninput = e=>updateAds(e.target.value);
+    // --- Кнопка добавления ---
+    $('add-btn').onclick = ()=>{$('add-modal').classList.add('show');};
+    $('cancel-modal').onclick = ()=>{$('add-modal').classList.remove('show');$('add-form').reset();$('geo-ok').style.display='none';};
+    // --- Гео ---
+    $('geo-btn').onclick = function(){
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(pos){
-          geo = pos.coords.latitude + "," + pos.coords.longitude;
+          let geo = pos.coords.latitude + "," + pos.coords.longitude;
           $('task-geo').value = geo;
           $('geo-ok').style.display='inline-block';
         }, function(){
@@ -429,32 +431,27 @@
         showMsg('Ваш браузер не підтримує геолокацію');
       }
     };
-    // --- Сабмит формы добавления ---
+    // --- Сабмит формы ---
     $('add-form').onsubmit = function(e){
       e.preventDefault();
-      // Анти-спам (раз в 30 сек)
       let now = Date.now();
       if(now - lastAdTime < 25000) {
         showMsg("Занадто часто! Спробуйте ще раз за 10 сек");
         return;
       }
-      // Валидация
       let name = $('task-name').value.trim().replace(/[<>&"]/g,"");
       let desc = $('task-desc').value.trim();
       let price = $('task-price').value.trim();
       let phone = $('task-phone').value.replace(/\D/g,'');
       let geo = $('task-geo').value.trim();
       let file = $('task-img').files[0];
-
       if(name && (hasLinks(name)||hasBadWords(name))) { showMsg("Ім'я не має містити посилань або нецензурних слів"); return;}
       if(desc.length<10) { showMsg('Опис має бути не менше 10 символів'); return;}
       if(hasLinks(desc)||hasBadWords(desc)) { showMsg('Опис не повинен містити посилань або нецензурних слів'); return;}
       if(!phone||!validUAphone(phone)) { showMsg('Вкажіть коректний номер телефону'); return;}
       if(price && (isNaN(price)||+price<1||price.length>7)) { showMsg('Вкажіть коректну ціну'); return;}
-      // Картинка
       let time = new Date().toLocaleString('uk-UA', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit'});
       let data = {name,desc,price,phone,time,geo,img:""};
-      // Обработка картинки
       if(file) {
         if(!file.type.startsWith('image/')){showMsg('Фото повинно бути зображенням');return;}
         let reader = new FileReader();
@@ -469,7 +466,6 @@
       lastAdTime = now;
       localStorage.lastAdTime = now;
     };
-
     function sendAd(data){
       fetch(SHEETDB_API, {
         method:'POST',
@@ -479,14 +475,13 @@
         .then(()=>{
           $('add-form').reset();$('add-modal').classList.remove('show');$('geo-ok').style.display='none';$('task-geo').value='';
           showMsg('Оголошення додано!');
-          setTimeout(()=>renderAds(),700);
+          setTimeout(()=>renderAds(),600);
         });
     }
-
     // --- Прелоадер ---
     let p = 0, bar = $('loader-bar');
     function preloadAnim(){
-      p+=13;
+      p+=15;
       if(p>100)p=100;
       bar.style.width=p+"%";
       if(p<100) setTimeout(preloadAnim,250);
@@ -496,7 +491,6 @@
       $('preloader').style.opacity=0;
       setTimeout(()=>{$('preloader').style.display="none";$('main-app').style.visibility="visible";},600);
       renderAds();
-      // автообновление
       setInterval(()=>renderAds($('search-inp').value),6000);
     },5000);
   </script>
