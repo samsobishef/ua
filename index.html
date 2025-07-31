@@ -6,7 +6,6 @@
   <title>СамСобіШеф | Робота в Одесі</title>
   <meta name="description" content="СамСобіШеф — дошка підробітку та виконавців в Одесі та області. Додавайте завдання, шукайте роботу!">
   <link rel="icon" type="image/png" href="https://i.ibb.co/HLc01jWL/22c6c8c1-5106-4955-bec9-7c071a2a41e3.png"/>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     :root {
       --main-bg: #f6fafc;
@@ -88,18 +87,23 @@
       padding: 0 10px 10px 10px;
       box-sizing: border-box;
       margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
     }
     .ad-card {
       background: #fafdff;
       border-radius: 13px;
       padding: 14px 14px 8px 14px;
-      margin-bottom: 13px;
       box-shadow: 0 1px 7px #dbe3f324;
       text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
     .ad-title {
       font-size: 16px;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
       font-weight: 600;
       color: #194d8f;
       word-break: break-word;
@@ -107,7 +111,7 @@
     .ad-meta {
       font-size: 14px;
       color: #3167ae;
-      margin-bottom: 3px;
+      margin-bottom: 2px;
       word-break: break-all;
     }
     .ad-meta2 {
@@ -117,7 +121,16 @@
     .ad-geo {
       font-size: 13px;
       color: #46a54d;
-      margin-bottom: 3px;
+      margin-bottom: 2px;
+    }
+    .ad-img {
+      max-width: 130px;
+      max-height: 90px;
+      margin-bottom: 7px;
+      border-radius: 7px;
+      background: #dde5ef;
+      object-fit: cover;
+      box-shadow: 0 2px 10px #acd4ff1a;
     }
     .add-btn-main {
       background: var(--primary);
@@ -186,15 +199,20 @@
       cursor: pointer;
       font-weight: 600;
     }
-    .geo-map {
-      width: 100%; height: 190px;
-      margin-top: 7px;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid #d1e4fa;
-      display: none;
+    .geo-field {
+      font-size: 13px;
+      color: #36b;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin: 7px 0 3px 0;
     }
-    .geo-map.show { display: block; }
+    .geo-ok {
+      color:#1c5;
+      font-size:13px;
+      margin-left:8px;
+      display:none;
+    }
     .modal-btns {
       display: flex;
       justify-content: flex-end;
@@ -249,7 +267,7 @@
       transition: .5s;
     }
     .preloader-logo {
-      width: 180px;
+      width: 230px;
       margin-bottom: 45px;
       margin-top: -60px;
       border-radius: 36px;
@@ -258,7 +276,7 @@
       object-fit: contain;
     }
     .loader-bar-wrap {
-      width: 210px; height: 12px;
+      width: 210px; height: 8px;
       background: #e3eefe;
       border-radius: 8px;
       overflow: hidden;
@@ -276,7 +294,7 @@
       .add-btn-main { max-width: 100vw; font-size: 1em;}
       .search-wrap, .ads-window { max-width: 99vw;}
       .preloader-bg { padding-bottom: 100px; }
-      .preloader-logo { width: 43vw; }
+      .preloader-logo { width: 60vw; }
       .loader-bar-wrap { width: 65vw;}
       .modal-card { width: 97vw; min-width: 0;}
     }
@@ -306,15 +324,18 @@
     <div class="modal-card">
       <h2>Додати оголошення</h2>
       <form id="add-form" autocomplete="off">
+        <div class="modal-field"><input type="text" id="task-name" placeholder="Ваше ім'я" maxlength="20"></div>
         <div class="modal-field"><textarea id="task-desc" placeholder="Опишіть завдання..." required minlength="10"></textarea></div>
-        <div class="modal-field"><input type="number" min="1" id="task-price" placeholder="Ціна, грн" required></div>
+        <div class="modal-field"><input type="number" min="1" id="task-price" placeholder="Ціна, грн"></div>
         <div class="modal-field"><input type="tel" id="task-phone" placeholder="Телефон" required></div>
-        <div class="modal-field">
-          <button type="button" class="geo-btn" id="geo-btn">Додати/Вказати геолокацію</button>
-          <span id="geo-ok" style="color:#1c5; font-size:13px; display:none;">✔ Додано</span>
+        <div class="modal-field geo-field">
+          <button type="button" class="geo-btn" id="geo-btn">Додати геолокацію</button>
+          <span class="geo-ok" id="geo-ok">✔ Додано</span>
         </div>
-        <div id="geo-map" class="geo-map"></div>
         <input type="hidden" id="task-geo">
+        <div class="modal-field">
+          <input type="file" id="task-img" accept="image/*" style="background:#fafdff;"/>
+        </div>
         <div class="modal-btns">
           <button type="button" class="modal-btn cancel" id="cancel-modal">Скасувати</button>
           <button type="submit" class="modal-btn">Опублікувати</button>
@@ -323,10 +344,12 @@
     </div>
   </div>
   <div class="msg" id="msg"></div>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
+    // --- SheetDB ---
     const SHEETDB_API = "https://sheetdb.io/api/v1/yb0rninf8e5x0";
     let adsCache = [];
+    let lastAdTime = +(localStorage.lastAdTime || 0);
+
     function $(x) {return document.getElementById(x);}
     function showMsg(txt) {
       $('msg').textContent = txt;
@@ -337,9 +360,16 @@
       let p = phone.replace(/\D/g, '');
       return (/^380\d{9}$/.test(p) || /^0\d{9}$/.test(p));
     }
-    function escapeHtml(t) {
-      return t ? t.replace(/[&<>"']/g,function(m){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[m];}) : '';
+    // --- Фильтрация мата и ссылок ---
+    const BAD_WORDS = ["хуй","пизд","еба","єба","бляд","сука","fuck","shit"];
+    function hasBadWords(txt){
+      txt = (txt||"").toLowerCase();
+      return BAD_WORDS.some(w=>txt.includes(w));
     }
+    function hasLinks(txt) {
+      return /(https?:\/\/|www\.|\.ru|\.ua|\.com|tg:|t\.me|@)/i.test(txt);
+    }
+    // --- Отрисовка объявлений ---
     function renderAds(filter='') {
       fetch(SHEETDB_API)
         .then(resp=>resp.json())
@@ -357,7 +387,8 @@
           (ad.desc||'').toLowerCase().includes(q) ||
           (ad.price||'').toLowerCase().includes(q) ||
           (ad.phone||'').toLowerCase().includes(q) ||
-          (ad.geo||'').toLowerCase().includes(q)
+          (ad.geo||'').toLowerCase().includes(q) ||
+          (ad.name||'').toLowerCase().includes(q)
         );
       }
       if(!ads.length) {
@@ -366,70 +397,80 @@
       }
       wrap.innerHTML = '';
       ads.forEach(ad=>{
-        let price = (ad.price && ad.price !== "undefined") ? escapeHtml(ad.price) : '—';
+        let price = (ad.price && ad.price !== "undefined") ? ad.price : '—';
         let geoHTML = ad.geo ? `<div class="ad-geo"><a href="https://maps.google.com/?q=${ad.geo}" target="_blank" style="color:#26a;text-decoration:underline;">📍 Геолокація</a></div>` : '';
+        let imgHTML = ad.img ? `<img src="${ad.img}" class="ad-img"/>` : '';
         let adHTML = `<div class="ad-card">
-              <div class="ad-title">${escapeHtml(ad.desc||'')}</div>
-              <div class="ad-meta">💰 <b>${price}</b> грн | ${escapeHtml(ad.phone||'')}</div>
+              <div class="ad-title">${imgHTML}${ad.desc||''}</div>
+              <div class="ad-meta">👤 <b>${ad.name||'Анонім'}</b> | 💰 <b>${price}</b> грн | ${ad.phone||''}</div>
               ${geoHTML}
-              <div class="ad-meta2">${escapeHtml(ad.time||'')}</div>
+              <div class="ad-meta2">${ad.time||''}</div>
             </div>`;
         wrap.innerHTML += adHTML;
       });
       setTimeout(()=>{$('ads-window').scrollTop = $('ads-window').scrollHeight;},60);
     }
     $('search-inp').oninput = function(){ updateAds(this.value); };
-    $('add-btn').onclick = ()=>{ $('add-modal').classList.add('show'); setTimeout(initMap,100);}
-    $('cancel-modal').onclick = ()=>{ $('add-modal').classList.remove('show'); $('add-form').reset();$('geo-ok').style.display='none';$('task-geo').value=''; hideMap();};
-    // Геолокация + карта
-    let map, marker;
-    function hideMap(){
-      $('geo-map').style.display='none';
-      if(map){ map.remove(); map = null; marker = null; }
-    }
-    function initMap() {
-      $('geo-map').style.display = 'block';
-      if(map){ map.remove(); }
-      map = L.map('geo-map').setView([46.4825, 30.7233], 11); // default Odessa
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: ''
-      }).addTo(map);
-      // Если гео уже выбрано — поставить маркер
-      let geoVal = $('task-geo').value;
-      if(geoVal){
-        let parts = geoVal.split(',');
-        marker = L.marker([+parts[0],+parts[1]]).addTo(map);
-        map.setView([+parts[0],+parts[1]], 14);
-      }
-      map.on('click', function(e) {
-        if(marker) marker.remove();
-        marker = L.marker(e.latlng).addTo(map);
-        $('task-geo').value = e.latlng.lat.toFixed(6) + "," + e.latlng.lng.toFixed(6);
-        $('geo-ok').style.display='inline-block';
-      });
-      // Попробовать автоопределить
-      if(navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(pos=>{
-          map.setView([pos.coords.latitude, pos.coords.longitude], 14);
-        });
-      }
-    }
+    $('add-btn').onclick = ()=>{ $('add-modal').classList.add('show');}
+    $('cancel-modal').onclick = ()=>{ $('add-modal').classList.remove('show'); $('add-form').reset();$('geo-ok').style.display='none';$('task-geo').value='';};
+    // --- Геолокация ---
+    let geo = '';
     $('geo-btn').onclick = function(e){
       e.preventDefault();
-      if($('geo-map').style.display==='block'){ hideMap(); } else { initMap(); }
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(pos){
+          geo = pos.coords.latitude + "," + pos.coords.longitude;
+          $('task-geo').value = geo;
+          $('geo-ok').style.display='inline-block';
+        }, function(){
+          showMsg('Не вдалося отримати геолокацію!');
+        });
+      } else {
+        showMsg('Ваш браузер не підтримує геолокацію');
+      }
     };
-    // Сабмит формы добавления
+    // --- Сабмит формы добавления ---
     $('add-form').onsubmit = function(e){
       e.preventDefault();
+      // Анти-спам (раз в 30 сек)
+      let now = Date.now();
+      if(now - lastAdTime < 25000) {
+        showMsg("Занадто часто! Спробуйте ще раз за 10 сек");
+        return;
+      }
+      // Валидация
+      let name = $('task-name').value.trim().replace(/[<>&"]/g,"");
       let desc = $('task-desc').value.trim();
       let price = $('task-price').value.trim();
       let phone = $('task-phone').value.replace(/\D/g,'');
       let geo = $('task-geo').value.trim();
-      if(desc.length<10){ showMsg('Опис має бути не менше 10 символів'); return;}
-      if(!price||isNaN(price)||+price<1){ showMsg('Вкажіть коректну ціну'); return;}
-      if(!validUAphone(phone)){ showMsg('Вкажіть коректний номер телефону'); return;}
+      let file = $('task-img').files[0];
+
+      if(name && (hasLinks(name)||hasBadWords(name))) { showMsg("Ім'я не має містити посилань або нецензурних слів"); return;}
+      if(desc.length<10) { showMsg('Опис має бути не менше 10 символів'); return;}
+      if(hasLinks(desc)||hasBadWords(desc)) { showMsg('Опис не повинен містити посилань або нецензурних слів'); return;}
+      if(!phone||!validUAphone(phone)) { showMsg('Вкажіть коректний номер телефону'); return;}
+      if(price && (isNaN(price)||+price<1||price.length>7)) { showMsg('Вкажіть коректну ціну'); return;}
+      // Картинка
       let time = new Date().toLocaleString('uk-UA', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit'});
-      let data = {desc,price,phone,time,geo};
+      let data = {name,desc,price,phone,time,geo,img:""};
+      // Обработка картинки
+      if(file) {
+        if(!file.type.startsWith('image/')){showMsg('Фото повинно бути зображенням');return;}
+        let reader = new FileReader();
+        reader.onload = function(e){
+          data.img = e.target.result;
+          sendAd(data);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        sendAd(data);
+      }
+      lastAdTime = now;
+      localStorage.lastAdTime = now;
+    };
+
+    function sendAd(data){
       fetch(SHEETDB_API, {
         method:'POST',
         headers:{'Content-Type':'application/json'},
@@ -438,28 +479,26 @@
         .then(()=>{
           $('add-form').reset();$('add-modal').classList.remove('show');$('geo-ok').style.display='none';$('task-geo').value='';
           showMsg('Оголошення додано!');
-          setTimeout(renderAds,700);
+          setTimeout(()=>renderAds(),700);
         });
-    };
-    // Loader
-    let loaderVal=0, loaderInt=setInterval(()=>{
-      loaderVal+=7+Math.random()*8;
-      if(loaderVal>=100)loaderVal=100;
-      $('loader-bar').style.width=loaderVal+'%';
-      if(loaderVal==100){
-        clearInterval(loaderInt);
-        setTimeout(()=>{
-          $('preloader').style.display='none';
-          $('main-app').style.visibility='visible';
-          renderAds();
-          setInterval(renderAds, 3500);
-        },400);
-      }
-    },95);
-    // Фикс скролла — только в ads-window!
-    document.body.style.overflow = "hidden";
-    $('ads-window').addEventListener('touchmove',e=>{e.stopPropagation();});
-    $('ads-window').addEventListener('wheel',e=>{e.stopPropagation();});
+    }
+
+    // --- Прелоадер ---
+    let p = 0, bar = $('loader-bar');
+    function preloadAnim(){
+      p+=13;
+      if(p>100)p=100;
+      bar.style.width=p+"%";
+      if(p<100) setTimeout(preloadAnim,250);
+    }
+    preloadAnim();
+    setTimeout(()=>{
+      $('preloader').style.opacity=0;
+      setTimeout(()=>{$('preloader').style.display="none";$('main-app').style.visibility="visible";},600);
+      renderAds();
+      // автообновление
+      setInterval(()=>renderAds($('search-inp').value),6000);
+    },5000);
   </script>
 </body>
 </html>
