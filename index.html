@@ -4,33 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>СамСобіШеф | Робота в Одесі</title>
-  <meta name="description" content="СамСобіШеф — платформа для пошуку підробітку та виконавців в Одесі та області. Реєструйтесь, додавайте завдання чи знаходьте роботу поруч!">
-  <meta property="og:title" content="СамСобіШеф | Робота в Одесі" />
-  <meta property="og:description" content="Швидкий пошук підробітку та виконавців в Одесі. Додавайте завдання або знаходьте роботу!" />
-  <meta property="og:image" content="https://i.ibb.co/HLc01jWL/22c6c8c1-5106-4955-bec9-7c071a2a41e3.png" />
+  <meta name="description" content="СамСобіШеф — платформа для пошуку підробітку та виконавців в Одесі та області. Додавайте завдання, вказуйте телефон та ціну — і чекайте на відгуки!">
   <link rel="icon" type="image/png" href="https://i.ibb.co/HLc01jWL/22c6c8c1-5106-4955-bec9-7c071a2a41e3.png"/>
   <style>
     body {font-family: Arial,sans-serif; background:#f5f7fc; margin:0; padding:0;}
-    .main-app {max-width:430px; margin:44px auto 0; padding:0 6px; transition: all .4s;}
+    .main-app {max-width:430px; margin:44px auto 0; padding:0 6px;}
     .logo {width:84px; display:block; margin:16px auto 18px; border-radius:22px;}
-    .login-form, .reg-form {background:#fff; border-radius:18px; padding:20px 14px 18px; box-shadow:0 2px 18px #d7e4f555; margin-bottom:24px; transition:.3s;}
-    .login-form h2, .reg-form h2 {margin-top:0; font-size:1.14em;}
-    .login-form input, .reg-form input {width:100%; padding:10px 9px; margin:8px 0 14px 0; border-radius:10px; border:1px solid #d8e6fc; font-size:1.02em; transition:.2s;}
-    .login-form button, .reg-form button, .btn-main {background:#2978e6; color:#fff; border:none; font-weight:600; font-size:1.07em; padding:12px 0; width:100%; border-radius:10px; box-shadow:0 2px 12px #bdd3fd16; margin:12px 0;}
-    .switch {text-align:center; color:#1a71b1; cursor:pointer; text-decoration:underline; margin:13px 0 0;}
-    .user-top {display:flex; justify-content:space-between; align-items:center; background:#e3f0ff; border-radius:14px; padding:10px 14px 8px; margin-bottom:16px;}
-    .user-top span {font-size:16px;}
-    .ads-list {margin-top:13px;}
-    .ad-card {background:#fff; border-radius:13px; padding:10px 11px 6px 11px; margin-bottom:10px; box-shadow:0 1px 9px #dbe3f330; transition:.25s;}
-    .ad-title {font-size:16px; margin-bottom:5px; font-weight:600;}
-    .ad-meta {font-size:12px; color:#3167ae; margin-bottom:5px;}
-    .ad-actions {display:flex; align-items:center; justify-content:space-between;}
-    .ad-likes {font-size:14px; cursor:pointer; color:#2093e7; display:flex; align-items:center;}
-    .ad-likes.liked {color:#ffad3d;}
-    .ad-likes span {margin-left:3px;}
-    .ad-views {font-size:13px; color:#b6cbe8;}
-    .ad-btn {padding:6px 16px; background:#2b81f7; color:#fff; border:none; border-radius:12px; cursor:pointer; font-size:13px; font-weight:700;}
-    .add-btn-main {background:#2b81f7; color:#fff; border:none; font-weight:700; font-size:1em; padding:12px 18px; border-radius:13px; margin:18px 0; display:block; box-shadow:0 2px 12px #d7e4f540; width:100%;transition:.25s;}
+    .add-btn-main {background:#2b81f7; color:#fff; border:none; font-weight:700; font-size:1.14em; padding:12px 18px; border-radius:13px; margin:24px auto; display:block; box-shadow:0 2px 12px #d7e4f540; width:100%;transition:.25s;}
     .modal-bg {position:fixed;z-index:10;top:0;left:0;width:100vw;height:100vh;background:#0005;display:flex;align-items:center;justify-content:center;animation:fadeIn .7s;transition:.4s;opacity:0;pointer-events:none;}
     .modal-bg.show {opacity:1; pointer-events:all;}
     .modal-card {background:#fff; border-radius:17px; box-shadow:0 4px 28px #b1d6fc45; width:340px; padding:26px 18px 12px; text-align:left; animation:popin .5s;}
@@ -41,8 +21,7 @@
     .modal-btns {display:flex;justify-content:flex-end;gap:15px;}
     .modal-btn {padding:10px 21px; font-size:15px; font-weight:700; border-radius:10px; border:none; background:#2186e7; color:#fff; cursor:pointer;}
     .modal-btn.cancel {background:#f0f0f0; color:#205;}
-    .hidden {display:none;}
-    .msg {padding:12px 9px; margin:11px 0; background:#fff4cc; border-radius:10px; color:#ae820c; text-align:center; font-size:1.1em; opacity:0; transition:.3s;}
+    .msg {padding:12px 9px; margin:19px 0; background:#fff4cc; border-radius:10px; color:#ae820c; text-align:center; font-size:1.13em; opacity:0; transition:.3s;}
     .msg.show {opacity:1;}
     .fadein {animation:fadeIn .8s;}
     @keyframes fadeIn {from{opacity:0;}to{opacity:1;}}
@@ -51,28 +30,7 @@
 <body>
   <div class="main-app fadein" id="main-app">
     <img src="https://i.ibb.co/HLc01jWL/22c6c8c1-5106-4955-bec9-7c071a2a41e3.png" class="logo" alt="logo"/>
-    <div id="auth-box">
-      <form class="login-form" id="login-form">
-        <h2>Вхід у СамСобіШеф</h2>
-        <input type="text" id="login-nick" placeholder="Ваш нік" required autocomplete="username">
-        <button type="submit">Увійти</button>
-        <div class="switch" id="go-register">Немає акаунту? Зареєструватися</div>
-      </form>
-      <form class="reg-form hidden" id="reg-form" autocomplete="off">
-        <h2>Реєстрація</h2>
-        <input type="text" id="reg-nick" placeholder="Бажаний нік (6+ символів)" minlength="6" maxlength="20" pattern="[a-zA-Z0-9_]+" required>
-        <input type="tel" id="reg-phone" placeholder="Телефон (+380XXXXXXXXX або 0XXXXXXXXX)" required maxlength="13">
-        <button type="submit">Зареєструватися</button>
-        <div class="switch" id="go-login">Вже є акаунт? Увійти</div>
-      </form>
-    </div>
-    <div id="user-panel" class="hidden">
-      <div class="user-top">
-        <span id="user-greet"></span>
-        <button class="add-btn-main" id="add-btn">Додати оголошення</button>
-      </div>
-      <div class="ads-list" id="ads-list"></div>
-    </div>
+    <button class="add-btn-main" id="add-btn">Додати оголошення</button>
   </div>
   <!-- Модалка додавання -->
   <div class="modal-bg" id="add-modal">
@@ -84,103 +42,25 @@
         <div class="modal-field"><input type="tel" id="task-phone" placeholder="Телефон" required></div>
         <div class="modal-btns">
           <button type="button" class="modal-btn cancel" id="cancel-modal">Скасувати</button>
-          <button type="submit" class="modal-btn">Опублікувати</button>
+          <button type="submit" class="modal-btn">Відправити</button>
         </div>
       </form>
     </div>
   </div>
   <div class="msg" id="msg"></div>
   <script>
-    // Cloudflare tunnel адрес (не забудь обновить, если ссылка изменится!)
+    // Укажи свой сервер (Cloudflare tunnel, например)
     const SERVER = 'https://internet-ahead-reviewed-bacterial.trycloudflare.com';
 
     function $(x) {return document.getElementById(x);}
     function showMsg(txt) {
       $('msg').textContent = txt;
       $('msg').classList.add('show');
-      setTimeout(()=>{$('msg').classList.remove('show');},2400);
-    }
-    let ads = [];
-    let user = null;
-    function validNick(nick) {
-      return typeof nick === "string" && /^[a-zA-Z0-9_]{6,20}$/.test(nick);
+      setTimeout(()=>{$('msg').classList.remove('show');},2700);
     }
     function validUAphone(phone) {
       let p = phone.replace(/\D/g, '');
       return (/^380\d{9}$/.test(p) || /^0\d{9}$/.test(p));
-    }
-    function saveUser(u){localStorage.setItem('sshef_user',JSON.stringify(u));}
-    function loadUser(){let d=localStorage.getItem('sshef_user');return d?JSON.parse(d):null;}
-    function showPanel(){
-      $('auth-box').classList.add('hidden');
-      $('user-panel').classList.remove('hidden');
-      $('user-greet').textContent = '👤 '+user.nick+' | '+user.phone;
-      loadAds();
-    }
-    function showAuth(){
-      $('auth-box').classList.remove('hidden');
-      $('user-panel').classList.add('hidden');
-    }
-    function fadeSwitch(showId, hideId) {
-      $(hideId).classList.add('hidden');
-      $(showId).classList.remove('hidden');
-      $(showId).classList.add('fadein');
-      setTimeout(()=>{$(showId).classList.remove('fadein');},500);
-    }
-    $('go-register').onclick = ()=>{ fadeSwitch('reg-form','login-form'); };
-    $('go-login').onclick = ()=>{ fadeSwitch('login-form','reg-form'); };
-
-    $('reg-form').onsubmit = async function(e){
-      e.preventDefault();
-      let nick = $('reg-nick').value.trim();
-      let phone = $('reg-phone').value.trim();
-      if (!validNick(nick)) return showMsg('Нік має бути мінімум 6 латинських символів!');
-      if (!validUAphone(phone)) return showMsg('Введіть коректний UA номер!');
-      let resp = await fetch(SERVER+'/check_nick', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nick})});
-      let data = await resp.json();
-      if (!data.ok) return showMsg('Такий нік вже існує!');
-      user = {nick, phone};
-      saveUser(user);
-      $('reg-form').reset();
-      showPanel();
-      await fetch(SERVER+'/visit', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(user)});
-    };
-    $('login-form').onsubmit = async function(e){
-      e.preventDefault();
-      let nick = $('login-nick').value.trim();
-      if (!validNick(nick)) return showMsg('Некоректний нік!');
-      let resp = await fetch(SERVER+'/check_nick', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nick,check_exist:true})});
-      let data = await resp.json();
-      if (!data.ok) return showMsg('Такого ніку не знайдено!');
-      user = {nick, phone:data.phone||""};
-      saveUser(user);
-      showPanel();
-    };
-    window.onload = function(){
-      user = loadUser();
-      if (user) showPanel(); else showAuth();
-    };
-    async function loadAds(){
-      let resp = await fetch(SERVER+'/ads');
-      let data = await resp.json();
-      ads = data;
-      renderAds();
-    }
-    function renderAds(){
-      let wrap = $('ads-list');
-      wrap.innerHTML = '';
-      if(!ads.length) wrap.innerHTML='<div style="text-align:center;color:#8a8c9b;">Оголошень ще немає...</div>';
-      ads.forEach(ad=>{
-        let adHTML = `<div class="ad-card">
-          <div class="ad-title">${ad.desc}</div>
-          <div class="ad-meta">💰 <b>${ad.price}</b> грн | ${ad.phone} | ${ad.user}</div>
-          <div class="ad-actions">
-            <div><span class="ad-likes">❤️ <span>${ad.likes}</span></span>
-            <span class="ad-views">👁️ ${ad.views||1}</span></div>
-          </div>
-        </div>`;
-        wrap.innerHTML += adHTML;
-      });
     }
     $('add-btn').onclick = ()=>{ $('add-modal').classList.add('show'); };
     $('cancel-modal').onclick = ()=>{ $('add-modal').classList.remove('show'); $('add-form').reset();};
@@ -189,10 +69,14 @@
       let desc=$('task-desc').value.trim(),price=$('task-price').value.trim(),phone=$('task-phone').value.trim();
       if(desc.length<10)return showMsg('Опис має бути від 10 символів!');
       if(!validUAphone(phone))return showMsg('Телефон некоректний!');
-      let payload = {desc, price, phone, user:user.nick};
-      let resp = await fetch(SERVER+'/new_ad', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      let payload = {desc, price, phone};
+      let resp = await fetch(SERVER+'/tg_notify', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(payload)
+      });
       $('add-modal').classList.remove('show');$('add-form').reset();
-      if ((await resp.json()).ok) showMsg('На модерації!');
+      if ((await resp.json()).ok) showMsg('Ваше оголошення відправлено адміністратору!');
       else showMsg('Помилка сервера!');
     };
   </script>
